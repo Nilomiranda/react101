@@ -10,6 +10,49 @@ export const Loading = styled.div`
   height: 100vh;
 `;
 
+export const Filter = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+
+  input {
+    margin-right: 7px;
+  }
+
+  label {
+    margin-right: 25px;
+  }
+`;
+
+export const PageController = styled.div`
+  margin-top: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  input {
+    width: 45px;
+    height: 45px;
+    font-size: 15px;
+    border: 1px solid #333;
+    color: #333;
+    padding-left: 17px;
+  }
+  button {
+    background: #7159c1;
+    color: #fff;
+    border: none;
+    padding: 15px;
+    font-size: 15px;
+    margin: 0 15px;
+
+    &:disabled {
+      background: rgba(0, 0, 0, 0.07);
+    }
+  }
+`;
+
 export const Owner = styled.header`
   display: flex;
   flex-direction: column;
