@@ -13,6 +13,8 @@ export default class Main extends Component {
     newRepo: '',
     repositories: [],
     loading: false,
+    error: false,
+    errorMessage: '',
   };
 
   // load local storage
@@ -38,26 +40,56 @@ export default class Main extends Component {
   };
 
   handleSubmit = async e => {
-    this.setState({ loading: true });
+    try {
+      this.setState({ loading: true });
 
-    e.preventDefault();
-    const { newRepo, repositories } = this.state;
+      e.preventDefault();
+      const { newRepo, repositories } = this.state;
 
-    const response = await api.get(`repos/${newRepo}`);
+      const existingRepository = repositories.filter(
+        repository => repository.name === newRepo
+      );
 
-    const data = {
-      name: response.data.full_name,
-    };
+      if (existingRepository.length > 0) {
+        throw new Error('Duplicated repository');
+      }
 
-    this.setState({
-      repositories: [...repositories, data],
-      newRepo: '',
-      loading: false,
-    });
+      const response = await api.get(`repos/${newRepo}`);
+
+      const data = {
+        name: response.data.full_name,
+      };
+
+      this.setState({
+        repositories: [...repositories, data],
+        newRepo: '',
+        loading: false,
+        error: false,
+        errorMessage: '',
+      });
+    } catch (err) {
+      if (err.message === 'Duplicated repository') {
+        this.setState({
+          loading: false,
+          error: true,
+          errorMessage: err.message,
+        });
+        return;
+      }
+      console.log(err, err.message);
+      if (err.message === 'Request failed with status code 404') {
+        this.setState({
+          loading: false,
+          error: true,
+          errorMessage: 'Repository not found',
+        });
+      }
+      this.setState({ loading: false, error: true });
+    }
   };
 
   render() {
-    const { newRepo, loading, repositories } = this.state;
+    const { newRepo, loading, repositories, error, errorMessage } = this.state;
 
     return (
       <Container>
@@ -66,13 +98,16 @@ export default class Main extends Component {
           Repositories
         </h1>
 
-        <Form onSubmit={e => this.handleSubmit(e)}>
-          <input
-            type="text"
-            placeholder="Add repository"
-            value={newRepo}
-            onChange={e => this.handleInputChange(e)}
-          />
+        <Form onSubmit={e => this.handleSubmit(e)} error={error}>
+          <div className="form-control">
+            <input
+              type="text"
+              placeholder="Add repository"
+              value={newRepo}
+              onChange={e => this.handleInputChange(e)}
+            />
+            <span>{errorMessage}</span>
+          </div>
 
           <SubmitButton loading={loading}>
             {loading ? (
@@ -97,24 +132,3 @@ export default class Main extends Component {
     );
   }
 }
-
-// function Main() {
-//   return (
-//     <Container>
-//       <h1>
-//         <FaGithubAlt />
-//         Repositories
-//       </h1>
-
-//       <Form onSubmit={() => {}}>
-//         <input type="text" placeholder="Add repository" />
-
-//         <SubmitButton>
-//           <FaPlus color="#FFF" size={14} />
-//         </SubmitButton>
-//       </Form>
-//     </Container>
-//   );
-// }
-
-// export default Main;

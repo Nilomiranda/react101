@@ -3,10 +3,23 @@ import styled, { keyframes, css } from 'styled-components';
 export const Form = styled.form`
   margin-top: 30px;
   display: flex;
+  align-items: stretch;
+
+  .form-control {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+
+    span {
+      margin-top: 10px;
+      color: #f00;
+    }
+  }
 
   input {
     flex: 1;
-    border: 1px solid #eee;
+    /* border: 1px solid #eee; */
+    border: ${props => (props.error ? '1px solid #F30' : '1px solid #EEE')};
     padding: 10px 15px;
     border-radius: 4px;
     font-size: 16px;
